@@ -1,8 +1,26 @@
 const request = require('request');
+const yargs = require('yargs');
+
+const argv = yargs
+    .options({
+        a: {
+            demand: true,
+            alias: 'address',
+            describe: 'Address to fetch weather for',
+            string: true
+        }
+})
+    .help()
+    .alias('help', 'h')
+    .argv;
+
+const encodedAddress = encodeURIComponent(argv.a);
 
 request({
-    url: 'http://maps.googleapis.com/maps/api/geocode/json?address=1129%20South%20Sunkist%20Avenue%20West%20Covina%20CA',
+    url: `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${process.env.WEATHER_APP_KEY}`,
     json: true
 }, (error, response, body) => {
-    console.log(body);
-})
+    console.log(`Address: ${body.results[0].formatted_address}`);
+    console.log(`Latitude: ${body.results[0].geometry.location.lat}`); 
+    console.log(`Longitude: ${body.results[0].geometry.location.lng}`);
+});
